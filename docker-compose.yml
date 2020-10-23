@@ -1,0 +1,41 @@
+version: '3'
+services:
+   backend:
+      build:
+         context: './'
+         dockerfile: Dockerfile
+      ports:
+         - '${APP_PORT}:3000'
+      volumes:
+         - './src:/src'
+      depends_on:
+         - mongo
+      links:
+         - mongo
+      environment:
+         - APP_PORT=${APP_PORT}
+         - APP_HOST=${APP_HOST}
+         - DB_USER=${DB_USER}
+         - DB_PASSWORD=${DB_ROOT_PASSWORD}
+         - DB_DATABASE=${DB_DATABASE}
+         - DB_PORT=${DB_PORT}
+         - DB_HOST=${DB_HOST}
+
+   mongo:
+      hostname: ${DB_HOST}
+      container_name: fav_note_db
+      image: mongo
+      restart: always
+      volumes:
+         - ./mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro
+      ports:
+         - '${DB_PORT}:27017'
+      environment:
+         - MONGO_INITDB_ROOT_USERNAME=${DB_ROOT}
+         - MONGO_INITDB_DATABASE=${DB_DATABASE}
+         - MONGO_INITDB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+         - MONGO_USER_USERNAME=${DB_USER}
+         - MONGO_USER_PASSWORD=${DB_PASSWORD}
+
+volumes:
+   mongo-data:
