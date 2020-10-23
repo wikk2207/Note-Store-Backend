@@ -1,0 +1,30 @@
+{
+  "name": "fav-note-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --exec babel-node src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wikk2207/Fav-Note-Backend.git"
+  },
+  "author": "Wiktoria Salamon",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wikk2207/Fav-Note-Backend/issues"
+  },
+  "homepage": "https://github.com/wikk2207/Fav-Note-Backend#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.12.1",
+    "@babel/core": "^7.12.3",
+    "@babel/node": "^7.12.1",
+    "@babel/preset-env": "^7.12.1",
+    "nodemon": "^2.0.6"
+  }
+}
