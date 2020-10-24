@@ -7,6 +7,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const User = require('./models/User');
 const LocalStrategy = require('passport-local').Strategy;
+const routes = require('./routes');
 
 const PORT = process.env.APP_PORT || 9000;
 
@@ -44,4 +45,5 @@ conn.on('error', console.error.bind(console, 'connection error:'));
 conn.once('open', () => {
   console.log('Connected to mlab database!');
   app.listen(PORT, () => console.log(`App is listening on port ${PORT}!`));
+  app.use('/api', routes);
 });
