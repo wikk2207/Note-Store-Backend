@@ -5,6 +5,7 @@
 
  const note = {
     addNote: async (req, res) => {
+        console.log(req.body);
         const newNoteContent = {
             type: req.body.type, // twitters, articles, notes
             title: req.body.title,
@@ -13,24 +14,21 @@
             twitterName: req.body.twitterName,
             userID: req.body.userID, 
         };
-        try {
-            const newNote = await new Note(newNoteContent).save((err, note) => {
+        const newNote = await new Note(newNoteContent).save((err, note) => {
+            if(err) {
+                res.sendStatus(500);
+            }
+            console.log('Note saved:', note);
             res.send(note);
         });
-        console.log('Note saved:', newNote);
-        } catch (err) {
-        console.log(err);
-        res.sendStatus(500);
-        }
     },
     getAllNotes: (req, res) => {
-        console.log(req);
-        Note.find({userID: req.query.userID})
+        Note.find({userID: req.body.userID})
             .then((results) => res.send(results))
             .catch((err) => console.log(err));
     },
     getAllNotesOfOneType: (req, res) => {
-        Note.find({userID: req.query.userID, type: req.query.type})
+        Note.find({userID: req.body.userID, type: req.body.type})
             .then((results) => res.send(results))
             .catch((err) => console.log(err));
     },

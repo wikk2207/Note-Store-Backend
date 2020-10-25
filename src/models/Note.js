@@ -19,11 +19,11 @@ const NoteSchema = new Schema({
     },
     articleUrl: {
         type: String,
-        required: true,
+        required: false,
     },
     twitterName: {
         type: String,
-        required: true,
+        required: false,
     },
     userID: {
         type: String,
