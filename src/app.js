@@ -7,6 +7,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const User = require('./models/User');
 const LocalStrategy = require('passport-local').Strategy;
+const routes = require('./routes');
 
 const PORT = process.env.APP_PORT || 9000;
 
@@ -42,6 +43,7 @@ mongoose.connect(`mongodb://${user}:${password}@${host}:${port}/${database}`, {
 const conn = mongoose.connection;
 conn.on('error', console.error.bind(console, 'connection error:'));
 conn.once('open', () => {
-  console.log('Connected to mlab database!');
+  console.log('Connected to mongo database!');
   app.listen(PORT, () => console.log(`App is listening on port ${PORT}!`));
+  app.use('/api', routes);
 });
