@@ -9,6 +9,6 @@ RUN npm install
 
 COPY src ./src
 
-EXPOSE 9000
+EXPOSE $APP_PORT
 
 CMD npm run start
