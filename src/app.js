@@ -43,7 +43,7 @@ mongoose.connect(`mongodb://${user}:${password}@${host}:${port}/${database}`, {
 const conn = mongoose.connection;
 conn.on('error', console.error.bind(console, 'connection error:'));
 conn.once('open', () => {
-  console.log('Connected to mlab database!');
+  console.log('Connected to mongo database!');
   app.listen(PORT, () => console.log(`App is listening on port ${PORT}!`));
   app.use('/api', routes);
 });
