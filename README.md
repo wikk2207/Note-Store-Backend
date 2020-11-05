@@ -1,4 +1,4 @@
-# Fav-Note-Backend
+# Note-Store-Backend
 
 ## Technologies
 

@@ -12,7 +12,8 @@
             content: req.body.content,
             articleUrl: req.body.articleUrl,
             twitterName: req.body.twitterName,
-            userID: req.body.userID, 
+            userID: req.body.userID,
+            created: req.body.created, 
         };
         const newNote = await new Note(newNoteContent).save((err, note) => {
             if(err) {
@@ -28,7 +29,7 @@
             .catch((err) => console.log(err));
     },
     getAllNotesOfOneType: (req, res) => {
-        Note.find({userID: req.body.userID, type: req.body.type})
+        Note.find({userID: req.query.userID, type: req.query.type})
             .then((results) => res.send(results))
             .catch((err) => console.log(err));
     },
@@ -50,12 +51,13 @@
             content: req.body.content,
             articleUrl: req.body.articleUrl,
             twitterName: req.body.twitterName,
+            created: req.body.created,
         };
         Note.findByIdAndUpdate(req.params.id, updatedNoteContent)
           .then((updatedNote) => res.send(updatedNote))
           .catch((err) => console.log(err));
         },
-        deleteNote: (req, res) => {
+    deleteNote: (req, res) => {
         Note.findByIdAndDelete(req.params.id)
           .then((result) => {
             if (!result) {
