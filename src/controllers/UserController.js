@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const passport = require('passport');
+const errorMessage = require('../utils/errorMessages');
 require('../models/User');
 
 const User = mongoose.model('users');
@@ -11,7 +12,7 @@ const user = {
         if (!user) {
             return res
                 .status(403)
-                .send("Invalid username or password");
+                .send(errorMessage.invalidUser);
         }
 
         req.logIn(user, function(err) {
@@ -30,14 +31,14 @@ const user = {
         if (!username || !password) {
             return res
                 .status(400)
-                .send("Username or password was not given");
+                .send(errorMessage.missingUserProperty);
         }
         console.log(username, password);
         User.register(new User({username}), password, function(err, user) {
             if (err.name === 'UserExistsError') {
                 return res
                     .status(409)
-                    .send("A user with the given username is already registered");
+                    .send(errorMessage.userRegistered);
             }
             if (err) {
                 console.log(err);

@@ -36,3 +36,7 @@ const NoteSchema = new Schema({
 });
 
 mongoose.model('notes', NoteSchema);
+module.exports = {
+    NoteSchema,
+    NOTE_TYPES,
+};
