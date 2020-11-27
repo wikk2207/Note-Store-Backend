@@ -25,7 +25,7 @@ services:
 
    mongo:
       hostname: ${DB_HOST}
-      container_name: fav_note_db
+      container_name: note_store_db
       image: mongo
       restart: always
       volumes:
