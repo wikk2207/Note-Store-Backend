@@ -61,7 +61,7 @@
             .then((results) => res.send(results))
             .catch((err) => console.log(err));
     },
-    getSingleNote: async (req, res) => {
+    getSingleNote: async (req, res, next) => {
         const { id } = req.params;
         Note.findById(id)
             .then(note => {
@@ -78,9 +78,8 @@
                 .send(errorMessage.noteDoesntExist);
             });
     },
-    updateNote: async (req, res) => {
+    updateNote: async (req, res, next) => {
         const { id } = req.params;
-
         const updatedNoteContent = { 
             type,// twitters, articles, notes
             title,
@@ -100,37 +99,20 @@
 
         Note.findByIdAndUpdate(id, updatedNoteContent, async (err, result) => {
             if(err) {
-                if(err.name === 'CastError') {
-                    return sendNoteNotFound(res);
-                }
+                res.sendStatus(500)
             }
-            getNote(id)
-                .then(note => {
-                    if(!note) {
-                        sendNoteNotFound(res);
-                        return;
-                    }
-                    res
-                        .status(200)
-                        .send(note);
-                });
+            next();
         });
 
     },
-    deleteNote: async (req, res) => {
+    deleteNote: async (req, res, next) => {
         const { id } = req.params;
-
-        const note = await Note.findById(id);
-        if(!note) { 
-            return res
-                .status(404)
-                .send(errorMessage.noteDoesntExist);
-         };
-
         Note.findByIdAndDelete(id)
           .then((result) => {
             if (!result) {
-              res.sendStatus(404)
+                return res
+                .status(404)
+                .send(errorMessage.noteDoesntExist);
             } else {
               res.sendStatus(200);
             }
@@ -156,25 +138,6 @@
        }
     }
     return requiredFields;
-};
-
-const getNote = async (id) => {
-    await Note.findById(id)
-        .then(note => {
-            if(!note) { 
-                return null
-                };
-            return note;
-        })
-        .catch( err => {
-            return null
-        });
-};
-
-const sendNoteNotFound = (res) => {
-    res
-        .status(404)
-        .send(errorMessage.noteDoesntExist);
 };
 
  module.exports = note;
