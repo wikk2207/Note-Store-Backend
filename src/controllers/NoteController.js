@@ -1,6 +1,7 @@
  const mongoose = require('mongoose');
  const { NoteSchema, NOTE_TYPES } = require('../models/Note');
  const errorMessage = require('../utils/errorMessages');
+ const checkRequiredField = require('../utils/checkRequiredField');
  require('../models/Note');
 
  const Note = mongoose.model('notes');
@@ -17,7 +18,7 @@
             created} = req.body;
         
         for (const property of requiredNoteFields()) {
-            if(!isValidRequiredProperty(newNoteContent[property], property, res)) {
+            if(!checkRequiredField(newNoteContent[property], property, res)) {
                 return;
             };
         }
@@ -40,7 +41,7 @@
     getAllNotes: async (req, res) => {
         const { userID } = req.body;
 
-        if (!isValidRequiredProperty(userID, 'userID', res)) { return };
+        if (!checkRequiredField(userID, 'userID', res)) { return };
 
         Note.find({userID})
             .then((results) => res.send(results))
@@ -49,8 +50,8 @@
     getAllNotesOfOneType: (req, res) => {
         const { userID, type } = req.body;
 
-        if (!isValidRequiredProperty(userID, 'userID', res)) { return };
-        if (!isValidRequiredProperty(type, 'type', res)) { return };
+        if (!checkRequiredField(userID, 'userID', res)) { return };
+        if (!checkRequiredField(type, 'type', res)) { return };
         if (!NOTE_TYPES.includes(type)) {
             return res
                 .status(400)
@@ -119,15 +120,6 @@
         })
         .catch((err) => res.sendStatus(500));
     }
- };
-
- const isValidRequiredProperty = (property, propertyName, res) => {
-    if (!property) {
-        res
-            .status(400)
-            .send(errorMessage.missingProperty(propertyName));
-    }
-    return Boolean(property);
  };
 
  const requiredNoteFields = () => {
