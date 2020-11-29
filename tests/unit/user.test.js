@@ -1,19 +1,12 @@
 const mongoose = require('mongoose');
-
 require('../../src/models/User');
-
 const UserModel = mongoose.model('users');
+const { setupDB } = require('../test-setup');
+const databaseName = "unit-user";
+
+setupDB(databaseName);
 
 describe('User Model Test', () => {
-
-    beforeAll(async () => {
-        await mongoose.connect(global.__MONGO_URI__, { useNewUrlParser: true, useCreateIndex: true }, (err) => {
-            if (err) {
-                console.error(err);
-                process.exit(1);
-            }
-        });
-    });
 
     it('create & save user successfully', async () => {
         const userData = {

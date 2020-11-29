@@ -1,67 +1,119 @@
  const mongoose = require('mongoose');
+ const { NoteSchema, NOTE_TYPES } = require('../models/Note');
+ const errorMessage = require('../utils/errorMessages');
+ const checkRequiredField = require('../utils/checkRequiredField');
  require('../models/Note');
 
  const Note = mongoose.model('notes');
 
  const note = {
     addNote: async (req, res) => {
-        console.log(req.body);
-        const newNoteContent = {
-            type: req.body.type, // twitters, articles, notes
-            title: req.body.title,
-            content: req.body.content,
-            articleUrl: req.body.articleUrl,
-            twitterName: req.body.twitterName,
-            userID: req.body.userID,
-            created: req.body.created, 
-        };
+        const newNoteContent = { 
+            type,// twitters, articles, notes
+            title,
+            content,
+            articleUrl,
+            twitterName,
+            userID,
+            created} = req.body;
+        
+        for (const property of requiredNoteFields()) {
+            if(!checkRequiredField(newNoteContent[property], property, res)) {
+                return;
+            };
+        }
+
+        if (!NOTE_TYPES.includes(newNoteContent.type)) {
+            return res
+                .status(400)
+                .send(errorMessage.invalidNoteType);
+        }
+
         const newNote = await new Note(newNoteContent).save((err, note) => {
             if(err) {
                 res.sendStatus(500);
             }
-            console.log('Note saved:', note);
-            res.send(note);
+            res
+            .status(201)
+            .send(note);
         });
     },
-    getAllNotes: (req, res) => {
-        Note.find({userID: req.body.userID})
+    getAllNotes: async (req, res) => {
+        const { userID } = req.body;
+
+        if (!checkRequiredField(userID, 'userID', res)) { return };
+
+        Note.find({userID})
             .then((results) => res.send(results))
             .catch((err) => console.log(err));
     },
     getAllNotesOfOneType: (req, res) => {
-        Note.find({userID: req.query.userID, type: req.query.type})
+        const { userID, type } = req.body;
+
+        if (!checkRequiredField(userID, 'userID', res)) { return };
+        if (!checkRequiredField(type, 'type', res)) { return };
+        if (!NOTE_TYPES.includes(type)) {
+            return res
+                .status(400)
+                .send(errorMessage.invalidNoteType);
+        }
+
+        Note.find({userID, type})
             .then((results) => res.send(results))
             .catch((err) => console.log(err));
     },
-    getSingleNote: (req, res) => {
-        Note.findById(req.params.id)
-            .then((results) => {
-                if (!results) {
-                res.send(404);
-                } else {
-                res.send(results)
-                }
+    getSingleNote: async (req, res, next) => {
+        const { id } = req.params;
+        Note.findById(id)
+            .then(note => {
+                if(!note) { 
+                    return res
+                        .status(404)
+                        .send(errorMessage.noteDoesntExist);
+                 };
+                return res.send(note);
             })
-            .catch((err) => res.send(404));
+            .catch( err => {
+                return res
+                .status(404)
+                .send(errorMessage.noteDoesntExist);
+            });
     },
-    updateNote: (req, res) => {
-        const updatedNoteContent = {
-            type: req.body.type, // twitters, articles, simple
-            title: req.body.title,
-            content: req.body.content,
-            articleUrl: req.body.articleUrl,
-            twitterName: req.body.twitterName,
-            created: req.body.created,
-        };
-        Note.findByIdAndUpdate(req.params.id, updatedNoteContent)
-          .then((updatedNote) => res.send(updatedNote))
-          .catch((err) => console.log(err));
-        },
-    deleteNote: (req, res) => {
-        Note.findByIdAndDelete(req.params.id)
+    updateNote: async (req, res, next) => {
+        const { id } = req.params;
+        const updatedNoteContent = { 
+            type,// twitters, articles, notes
+            title,
+            content,
+            articleUrl,
+            twitterName,
+            userID,
+            created} = req.body;
+
+        if (type) {
+            if (!NOTE_TYPES.includes(newNoteContent.type)) {
+                return res
+                    .status(400)
+                    .send(errorMessage.invalidNoteType);
+            }
+        }
+
+        Note.findByIdAndUpdate(id, updatedNoteContent, async (err, result) => {
+            if(err) {
+                res.sendStatus(500)
+            }
+            next();
+        });
+
+    },
+    deleteNote: async (req, res, next) => {
+        const { id } = req.params;
+        Note.findByIdAndDelete(id)
           .then((result) => {
             if (!result) {
-              res.sendStatus(404)
+                return res
+                .status(404)
+                .send(errorMessage.noteDoesntExist);
             } else {
               res.sendStatus(200);
             }
@@ -69,5 +121,15 @@
         .catch((err) => res.sendStatus(500));
     }
  };
+
+ const requiredNoteFields = () => {
+    const requiredFields = [];
+    for (property in NoteSchema.obj) {
+       if(NoteSchema.obj[property].required) {
+           requiredFields.push(property)
+       }
+    }
+    return requiredFields;
+};
 
  module.exports = note;

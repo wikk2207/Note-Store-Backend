@@ -1,8 +1,10 @@
 const mongoose = require('mongoose');
-
 require('../../src/models/Note');
-
 const NoteModel = mongoose.model('notes');
+const { setupDB } = require('../test-setup');
+const databaseName = "unit-note";
+
+setupDB(databaseName);
 
 const noteData = {
     type: 'notes',
@@ -13,16 +15,6 @@ const noteData = {
 };
 
 describe('Note Model Test', () => {
-
-    beforeAll(async () => {
-        await mongoose.connect(global.__MONGO_URI__, { useNewUrlParser: true, useCreateIndex: true }, (err) => {
-            if (err) {
-                console.error(err);
-                process.exit(1);
-            }
-        });
-    });
-    
     it('create & save note successfully', async () => {
         const savedNote = await new NoteModel(noteData).save()
 
@@ -57,5 +49,4 @@ describe('Note Model Test', () => {
         expect(err.errors.userID).toBeDefined();
         expect(err.errors.created).toBeDefined();
     });
-
 });

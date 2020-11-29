@@ -1,5 +1,6 @@
 const express = require('express');
 const { note, user } = require('../controllers');
+const { noteExistsMiddleware } = require('../middlewares/noteMiddlewares');
 
 const router = express.Router();
 
@@ -12,7 +13,7 @@ router.get('/notes/type', note.getAllNotesOfOneType);
 
 router.post('/note', note.addNote);
 router.get('/note/:id', note.getSingleNote);
-router.put('/note/:id', note.updateNote);
-router.delete('/note/:id', note.deleteNote);
+router.patch('/note/:id', noteExistsMiddleware, note.updateNote, note.getSingleNote);
+router.delete('/note/:id', noteExistsMiddleware, note.deleteNote);
 
 module.exports = router;

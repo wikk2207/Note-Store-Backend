@@ -20,3 +20,13 @@
 <td>Docker Compose</td>
 </tr>
 </table>
+
+## Tests
+
+To run tests you have to install mongoDB server and have it active.
+
+```
+$ sudo systemctl start mongod
+$ npm run test
+```
+
