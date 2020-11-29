@@ -13,7 +13,6 @@ const noteData = {
 };
 
 describe('Note Model Test', () => {
-
     beforeAll(async () => {
         await mongoose.connect(global.__MONGO_URI__, { useNewUrlParser: true, useCreateIndex: true }, (err) => {
             if (err) {
@@ -57,5 +56,4 @@ describe('Note Model Test', () => {
         expect(err.errors.userID).toBeDefined();
         expect(err.errors.created).toBeDefined();
     });
-
 });

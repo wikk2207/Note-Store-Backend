@@ -32,11 +32,12 @@
             if(err) {
                 res.sendStatus(500);
             }
-            console.log('Note saved:', note);
-            res.send(note);
+            res
+            .status(201)
+            .send(note);
         });
     },
-    getAllNotes: (req, res) => {
+    getAllNotes: async (req, res) => {
         const { userID } = req.body;
 
         if (!isValidRequiredProperty(userID, 'userID', res)) { return };
@@ -50,18 +51,36 @@
 
         if (!isValidRequiredProperty(userID, 'userID', res)) { return };
         if (!isValidRequiredProperty(type, 'type', res)) { return };
+        if (!NOTE_TYPES.includes(type)) {
+            return res
+                .status(400)
+                .send(errorMessage.invalidNoteType);
+        }
 
         Note.find({userID, type})
             .then((results) => res.send(results))
             .catch((err) => console.log(err));
     },
-    getSingleNote: (req, res) => {
+    getSingleNote: async (req, res) => {
         const { id } = req.params;
-        const note = findNote(id, res);
-        if(!note) { return };
-        res.send(note);
+        Note.findById(id)
+            .then(note => {
+                if(!note) { 
+                    return res
+                        .status(404)
+                        .send(errorMessage.noteDoesntExist);
+                 };
+                return res.send(note);
+            })
+            .catch( err => {
+                return res
+                .status(404)
+                .send(errorMessage.noteDoesntExist);
+            });
     },
-    updateNote: (req, res) => {
+    updateNote: async (req, res) => {
+        const { id } = req.params;
+
         const updatedNoteContent = { 
             type,// twitters, articles, notes
             title,
@@ -71,15 +90,42 @@
             userID,
             created} = req.body;
 
-        Note.findByIdAndUpdate(req.params.id, updatedNoteContent)
-          .then((updatedNote) => res.send(updatedNote))
-          .catch((err) => console.log(err));
-        },
-    deleteNote: (req, res) => {
+        if (type) {
+            if (!NOTE_TYPES.includes(newNoteContent.type)) {
+                return res
+                    .status(400)
+                    .send(errorMessage.invalidNoteType);
+            }
+        }
+
+        Note.findByIdAndUpdate(id, updatedNoteContent, async (err, result) => {
+            if(err) {
+                if(err.name === 'CastError') {
+                    return sendNoteNotFound(res);
+                }
+            }
+            getNote(id)
+                .then(note => {
+                    if(!note) {
+                        sendNoteNotFound(res);
+                        return;
+                    }
+                    res
+                        .status(200)
+                        .send(note);
+                });
+        });
+
+    },
+    deleteNote: async (req, res) => {
         const { id } = req.params;
 
-        const note = findNote(id, res);
-        if(!note) { return };
+        const note = await Note.findById(id);
+        if(!note) { 
+            return res
+                .status(404)
+                .send(errorMessage.noteDoesntExist);
+         };
 
         Note.findByIdAndDelete(id)
           .then((result) => {
@@ -102,28 +148,6 @@
     return Boolean(property);
  };
 
- const sendNoteNotExist = (res) => {
-    res
-        .status(404)
-        .send(errorMessage.noteDoesntExist);
- }
-
- const findNote = (id, res) => {
-    Note.findById(id)
-        .then((results) => {
-            if (!results) {
-                sendNoteNotExist(res);
-                return null;
-            } else {
-                return results;
-            }
-        })
-        .catch((err) => {
-            sendNoteNotExist(res);
-            return null;
-        });
- }
-
  const requiredNoteFields = () => {
     const requiredFields = [];
     for (property in NoteSchema.obj) {
@@ -132,6 +156,25 @@
        }
     }
     return requiredFields;
+};
+
+const getNote = async (id) => {
+    await Note.findById(id)
+        .then(note => {
+            if(!note) { 
+                return null
+                };
+            return note;
+        })
+        .catch( err => {
+            return null
+        });
+};
+
+const sendNoteNotFound = (res) => {
+    res
+        .status(404)
+        .send(errorMessage.noteDoesntExist);
 };
 
  module.exports = note;
