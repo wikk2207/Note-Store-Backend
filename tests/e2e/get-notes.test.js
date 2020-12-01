@@ -21,8 +21,8 @@ describe('GET /api/notes', () => {
       .send(noteData);
 
     const getRes = await request
-    .get('/api/notes')
-    .send({userID: noteData.userID});
+      .get(`/api/notes?userID=${noteData.userID}`)
+      .send();
 
     expect(postRes.statusCode).toEqual(201);
     expect(getRes.statusCode).toEqual(200);
@@ -31,8 +31,8 @@ describe('GET /api/notes', () => {
 
   it('should get empty list', async () => {
     const res = await request
-    .get('/api/notes')
-    .send({userID: noteData.userID});
+        .get(`/api/notes?userID=${noteData.userID}`)
+        .send();
 
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveLength(0);

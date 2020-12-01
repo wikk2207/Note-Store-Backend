@@ -39,7 +39,7 @@
         });
     },
     getAllNotes: async (req, res) => {
-        const { userID } = req.body;
+        const { userID } = req.query;
 
         if (!checkRequiredField(userID, 'userID', res)) { return };
 
@@ -48,7 +48,7 @@
             .catch((err) => console.log(err));
     },
     getAllNotesOfOneType: (req, res) => {
-        const { userID, type } = req.body;
+        const { userID, type } = req.query;
 
         if (!checkRequiredField(userID, 'userID', res)) { return };
         if (!checkRequiredField(type, 'type', res)) { return };
