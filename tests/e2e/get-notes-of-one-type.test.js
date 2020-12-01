@@ -29,29 +29,29 @@ describe('GET /api/notes/type', () => {
         .send({...noteData, type: 'twitters'});
 
     const getRes = await request
-        .get('/api/notes')
-        .send({userID: noteData.userID});
+        .get(`/api/notes?userID=${noteData.userID}`)
+        .send();
 
     expect(getRes.statusCode).toEqual(200);
     expect(getRes.body).toHaveLength(3);
 
     const getNotesRes = await request
-        .get('/api/notes/type')
-        .send({userID: noteData.userID, type: 'notes'});
+      .get(`/api/notes/type?userID=${noteData.userID}&type=notes`)
+      .send();
 
     expect(getNotesRes.statusCode).toEqual(200);
     expect(getNotesRes.body).toHaveLength(1);
 
     const getArticlesRes = await request
-        .get('/api/notes/type')
-        .send({userID: noteData.userID, type: 'articles'});
+      .get(`/api/notes/type?userID=${noteData.userID}&type=articles`)
+      .send();
 
     expect(getArticlesRes.statusCode).toEqual(200);
     expect(getArticlesRes.body).toHaveLength(1);
 
     const getTwittersRes = await request
-        .get('/api/notes/type')
-        .send({userID: noteData.userID, type: 'twitters'});
+      .get(`/api/notes/type?userID=${noteData.userID}&type=twitters`)
+      .send();
 
     expect(getTwittersRes.statusCode).toEqual(200);
     expect(getTwittersRes.body).toHaveLength(1);
@@ -59,8 +59,8 @@ describe('GET /api/notes/type', () => {
 
   it('should get empty list', async () => {
     const res = await request
-        .get('/api/notes/type')
-        .send({userID: noteData.userID, type: 'notes'});
+      .get(`/api/notes/type?userID=${noteData.userID}&type=notes`)
+      .send();
 
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveLength(0);
@@ -68,8 +68,8 @@ describe('GET /api/notes/type', () => {
 
   it('should get error because of lack of the userID property', async () => {
     const res = await request
-        .get('/api/notes/type')
-        .send({type: 'notes'});
+      .get(`/api/notes/type?type=notes`)
+      .send();
 
     expect(res.statusCode).toEqual(400);
     expect(res.text).toEqual('Property "userID" is required')
@@ -77,8 +77,8 @@ describe('GET /api/notes/type', () => {
 
   it('should get error because of lack of the type property', async () => {
     const res = await request
-        .get('/api/notes/type')
-        .send({userID: 'id'});
+      .get(`/api/notes/type?userID=${noteData.userID}`)
+      .send();
 
     expect(res.statusCode).toEqual(400);
     expect(res.text).toEqual('Property "type" is required')
@@ -86,8 +86,8 @@ describe('GET /api/notes/type', () => {
 
   it('should get error because of invalid type property', async () => {
     const res = await request
-        .get('/api/notes/type')
-        .send({userID: 'id', type: "type"});
+    .get(`/api/notes/type?userID=${noteData.userID}&type=type`)
+    .send();
 
     expect(res.statusCode).toEqual(400);
     expect(res.text).toEqual('Note\'s type must be one of: "twitters", "articles", "notes"')
