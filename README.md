@@ -21,6 +21,13 @@
 </tr>
 </table>
 
+## How to run this app
+
+```
+docker-compose build
+docker-compose up
+```
+
 ## Tests
 
 To run tests you have to install mongoDB server and have it active.
@@ -29,4 +36,3 @@ To run tests you have to install mongoDB server and have it active.
 $ sudo systemctl start mongod
 $ npm run test
 ```
-
